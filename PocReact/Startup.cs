@@ -1,12 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SimpleNet.Core.Data;
+using SimpleNet.Core.Data.SqlServer;
+using SimpleNet.Core.Data.Repository;
+using PocReact.Repository;
+using PocReact.Repository.Contracts;
 
 namespace PocReact
 {
@@ -23,6 +25,16 @@ namespace PocReact
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+
+
+            var connectionString = Configuration.GetConnectionString("defaultConnection");
+
+            ISimpleDatabaseProvider dbProvider = new SqlServerProvider(connectionString);
+            
+            services.AddSingleton(Configuration);
+            services.AddSingleton(dbProvider);
+            services.AddTransient<ISimpleDataAccessLayer, SimpleDataAccessLayer>();
+            services.AddTransient<ICustomerRepository, CustomerRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
